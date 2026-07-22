@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서신서 완독 여정</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<!-- Firebase (실시간 데이터베이스) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root{
+    --ink:#F1EAD9;
+    --ink-dim:#B9AF9A;
+    --bg:#12192A;
+    --bg-deep:#0C1220;
+    --card:#1B253D;
+    --card-soft:#212C48;
+    --line:#33405F;
+    --gold:#D8AE68;
+    --gold-soft:rgba(216,174,104,0.18);
+    --sage:#7DA398;
+    --sage-soft:rgba(125,163,152,0.16);
+    --weekend:#243052;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 0%, #1a2440 0%, transparent 45%),
+      radial-gradient(circle at 90% 10%, #17203a 0%, transparent 40%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Pretendard', -apple-system, sans-serif;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:28px 18px 0;}
+
+  header{ text-align:center; margin-bottom:22px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing:.18em; color:var(--sage);
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  h1{
+    font-family:'Noto Serif KR', serif;
+    font-weight:900;
+    font-size:30px;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .sub{ color:var(--ink-dim); font-size:14px; margin-bottom:22px; }
+
+  .demo-banner{
+    background:var(--gold-soft); border:1px solid var(--gold); color:var(--gold);
+    border-radius:12px; padding:10px 14px; font-size:12.5px; margin-bottom:18px;
+    display:none; line-height:1.6;
+  }
+  .demo-banner.show{ display:block; }
+
+  .ring-card{
+    background:linear-gradient(160deg, var(--card) 0%, var(--card-soft) 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:20px 18px;
+    display:flex; align-items:center; gap:18px;
+    margin-bottom:20px;
+  }
+  .ring{ position:relative; width:86px; height:86px; flex:none; }
+  .ring svg{ width:86px; height:86px; transform:rotate(-90deg); }
+  .ring-pct{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:17px; color:var(--gold);
+  }
+  .ring-info{ flex:1; }
+  .ring-info .label{ font-size:12.5px; color:var(--ink-dim); margin-bottom:3px; }
+  .ring-info .val{ font-family:'Noto Serif KR',serif; font-weight:700; font-size:16px; }
+
+  .tabs{
+    display:flex; gap:6px; margin-bottom:20px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:5px;
+  }
+  .tab-btn{
+    flex:1; padding:10px 4px; text-align:center;
+    background:transparent; border:none; color:var(--ink-dim);
+    font-family:'Pretendard'; font-size:14px; font-weight:600;
+    border-radius:10px; cursor:pointer; transition:.18s;
+  }
+  .tab-btn.active{ background:var(--gold); color:#221A0E; }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+
+  .select-row{
+    display:flex; gap:8px; margin-bottom:16px; align-items:center;
+  }
+  select{
+    flex:1; appearance:none;
+    background:var(--card); color:var(--ink);
+    border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px; font-size:15px; font-family:'Pretendard'; font-weight:600;
+  }
+  .icon-btn{
+    width:44px; height:44px; border-radius:12px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink-dim); font-size:17px; cursor:pointer;
+    flex:none;
+  }
+  .icon-btn:active{ transform:scale(.94); }
+
+  .me-progress{
+    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+  }
+  .me-progress .bar-track{ flex:1; height:8px; background:var(--bg-deep); border-radius:99px; overflow:hidden; }
+  .me-progress .bar-fill{ height:100%; background:linear-gradient(90deg,var(--sage),var(--gold)); border-radius:99px; transition:width .4s; }
+  .me-progress .count{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--gold); white-space:nowrap; }
+
+  .empty-hint{
+    text-align:center; color:var(--ink-dim); padding:50px 10px; font-size:14px; line-height:1.7;
+  }
+
+  .month-label{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;
+    color:var(--sage); margin:20px 0 8px; padding-left:2px; text-transform:uppercase;
+  }
+  .day-row{
+    display:flex; align-items:center; gap:12px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:11px 12px; margin-bottom:7px;
+    transition:.15s;
+  }
+  .day-row.weekend{ background:var(--weekend); }
+  .day-row.today{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
+  .date-badge{
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px;
+    color:var(--ink); width:44px; flex:none; line-height:1.25;
+  }
+  .date-badge .dow{ display:block; font-size:11px; color:var(--ink-dim); }
+  .passage{ flex:1; font-size:14.5px; font-weight:500; }
+  .today-tag{
+    font-size:10.5px; color:var(--gold); border:1px solid var(--gold); border-radius:99px;
+    padding:2px 7px; margin-left:6px; font-family:'IBM Plex Mono',monospace;
+  }
+  .stamp{
+    width:36px; height:36px; border-radius:50%; flex:none; cursor:pointer;
+    border:2px solid var(--line); background:transparent; color:transparent;
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+    transition:.15s; font-weight:700;
+  }
+  .stamp.checked{
+    background:var(--gold); border-color:var(--gold); color:#221A0E;
+    transform:scale(1.04);
+  }
+  .stamp:active{ transform:scale(.9); }
+
+  .team-card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; margin-bottom:14px;
+  }
+  .team-head{
+    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;
+  }
+  .team-head .name{ font-family:'Noto Serif KR',serif; font-weight:700; font-size:16px; }
+  .team-head .pct{ font-family:'IBM Plex Mono',monospace; color:var(--sage); font-size:13px; }
+  .member-row{
+    display:flex; align-items:center; gap:10px; padding:6px 2px; cursor:pointer;
+    border-radius:8px;
+  }
+  .member-row:hover{ background:var(--card-soft); }
+  .member-row .mname{ width:64px; flex:none; font-size:13.5px; font-weight:600; }
+  .member-row .mbar-track{ flex:1; height:6px; background:var(--bg-deep); border-radius:99px; overflow:hidden; }
+  .member-row .mbar-fill{ height:100%; background:var(--gold); border-radius:99px; }
+  .member-row .mpct{ width:38px; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-dim); }
+
+  .team-bar-row{ margin-bottom:14px; }
+  .team-bar-row .tlabel{ display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:5px; }
+  .team-bar-row .tlabel b{ font-weight:700; }
+  .team-bar-row .tlabel span{ color:var(--gold); font-family:'IBM Plex Mono',monospace; }
+  .team-bar-track{ height:9px; background:var(--card); border:1px solid var(--line); border-radius:99px; overflow:hidden; }
+  .team-bar-fill{ height:100%; background:linear-gradient(90deg,var(--sage),var(--gold)); border-radius:99px; }
+
+  table.rank{ width:100%; border-collapse:collapse; margin-top:16px; }
+  table.rank th, table.rank td{
+    text-align:left; padding:9px 6px; font-size:13px; border-bottom:1px solid var(--line);
+  }
+  table.rank th{ color:var(--ink-dim); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; }
+  table.rank td.pct{ font-family:'IBM Plex Mono',monospace; color:var(--gold); }
+  table.rank td.rk{ color:var(--ink-dim); width:26px; }
+
+  .section-title{
+    font-family:'Noto Serif KR',serif; font-weight:700; font-size:16px; margin:22px 0 10px;
+  }
+  .status-line{ text-align:center; font-size:12.5px; color:var(--ink-dim); margin-top:22px; }
+  .refresh-note{ display:flex; justify-content:flex-end; margin-bottom:6px; }
+  .refresh-note button{
+    background:none; border:none; color:var(--sage); font-size:12.5px; cursor:pointer;
+    display:flex; align-items:center; gap:4px; font-family:'Pretendard';
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Romans → Jude · 7.13 – 10.6</div>
+    <h1>서신서 완독 여정</h1>
+    <div class="sub">로마서부터 유다서까지, 86일간 함께 걷는 통독</div>
+  </header>
+
+  <div class="demo-banner" id="demoBanner">
+    ⚠️ Firebase 설정값이 아직 입력되지 않아 <b>데모 모드</b>로 실행 중입니다.
+    이 상태에서는 데이터가 저장되지 않고 새로고침하면 사라져요.
+    코드 상단의 <code>firebaseConfig</code> 값을 본인의 Firebase 프로젝트 값으로 바꿔주세요.
+  </div>
+
+  <div class="ring-card">
+    <div class="ring">
+      <svg viewBox="0 0 86 86">
+        <circle cx="43" cy="43" r="37" stroke="#33405F" stroke-width="8" fill="none"/>
+        <circle id="ringFill" cx="43" cy="43" r="37" stroke="#D8AE68" stroke-width="8" fill="none"
+          stroke-dasharray="232.5" stroke-dashoffset="232.5" stroke-linecap="round"/>
+      </svg>
+      <div class="ring-pct" id="overallPctText">0%</div>
+    </div>
+    <div class="ring-info">
+      <div class="label">전체 완독률 (전 팀 합산)</div>
+      <div class="val" id="overallCountText">불러오는 중…</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="checklist">체크리스트</button>
+    <button class="tab-btn" data-tab="teams">팀별 명단</button>
+    <button class="tab-btn" data-tab="progress">진행률</button>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="panel active" id="panel-checklist">
+    <div class="select-row">
+      <select id="nameSelect">
+        <option value="">내 이름 선택하기</option>
+      </select>
+      <button class="icon-btn" id="refreshBtn" title="새로고침">⟳</button>
+    </div>
+
+    <div id="meProgressBox" style="display:none;">
+      <div class="me-progress">
+        <div class="bar-track"><div class="bar-fill" id="meBarFill" style="width:0%"></div></div>
+        <div class="count" id="meCountText">0 / 86</div>
+      </div>
+    </div>
+
+    <div id="checklistEmpty" class="empty-hint">
+      위에서 본인 이름을 선택하면<br>날짜별 체크리스트가 나타납니다.
+    </div>
+
+    <div id="checklistBody"></div>
+  </div>
+
+  <!-- TEAMS -->
+  <div class="panel" id="panel-teams">
+    <div id="teamsBody"></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="panel" id="panel-progress">
+    <div class="refresh-note"><button id="refreshBtn2">⟳ 새로고침</button></div>
+    <div class="section-title">팀별 완독률</div>
+    <div id="teamBars"></div>
+    <div class="section-title">전체 순위</div>
+    <table class="rank">
+      <thead><tr><th>#</th><th>이름</th><th>팀</th><th>완독</th><th>%</th></tr></thead>
+      <tbody id="rankBody"></tbody>
+    </table>
+  </div>
+
+  <div class="status-line" id="statusLine"></div>
+</div>
+
+<script>
+/* =========================================================
+   ⚙️ FIREBASE 설정 — 여기를 본인 프로젝트 값으로 교체하세요
+   Firebase 콘솔 > 프로젝트 설정 > 일반 > 내 앱 에서 확인 가능
+========================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyA_qThxe0vtYWJ_PtN_4Lk_M_eqhJjwPGo",
+  authDomain: "god-project-25714.firebaseapp.com",
+  databaseURL: "https://god-project-25714-default-rtdb.firebaseio.com",
+  projectId: "god-project-25714",
+  storageBucket: "god-project-25714.firebasestorage.app",
+  messagingSenderId: "549521704099",
+  appId: "1:549521704099:web:9e40a57f6153c49ebb6b16"
+};
+
+let firebaseReady = false;
+let checksRef = null;
+
+try{
+  if(firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY"){
+    firebase.initializeApp(firebaseConfig);
+    checksRef = firebase.database().ref('checks');
+    firebaseReady = true;
+  }
+}catch(e){
+  console.error("Firebase init failed:", e);
+}
+
+/* ---------------- DATA ---------------- */
+const schedule = [
+["07-13","월","로마서 1"],["07-14","화","로마서 2"],["07-15","수","로마서 3"],
+["07-16","목","로마서 4"],["07-17","금","로마서 5"],["07-18","토","로마서 6~7"],
+["07-19","일","로마서 8~9"],["07-20","월","로마서 10"],["07-21","화","로마서 11"],
+["07-22","수","로마서 12~13"],["07-23","목","로마서 14"],["07-24","금","로마서 15"],
+["07-25","토","로마서 16, 고린도전서 1"],["07-26","일","고린도전서 2~3"],["07-27","월","고린도전서 4"],
+["07-28","화","고린도전서 5"],["07-29","수","고린도전서 6~7"],["07-30","목","고린도전서 8"],
+["07-31","금","고린도전서 9"],["08-01","토","고린도전서 10~11"],["08-02","일","고린도전서 12~13"],
+["08-03","월","고린도전서 14"],["08-04","화","고린도전서 15"],["08-05","수","고린도전서 16, 고린도후서 1"],
+["08-06","목","고린도후서 2"],["08-07","금","고린도후서 3"],["08-08","토","고린도후서 4~5"],
+["08-09","일","고린도후서 6~7"],["08-10","월","고린도후서 8"],["08-11","화","고린도후서 9"],
+["08-12","수","고린도후서 10~11"],["08-13","목","고린도후서 12"],["08-14","금","고린도후서 13"],
+["08-15","토","갈라디아서 1~2"],["08-16","일","갈라디아서 3~4"],["08-17","월","갈라디아서 5"],
+["08-18","화","갈라디아서 6"],["08-19","수","에베소서 1~2"],["08-20","목","에베소서 3"],
+["08-21","금","에베소서 4"],["08-22","토","에베소서 5~6"],["08-23","일","빌립보서 1~2"],
+["08-24","월","빌립보서 3"],["08-25","화","빌립보서 4"],["08-26","수","골로새서 1~2"],
+["08-27","목","골로새서 3"],["08-28","금","골로새서 4"],["08-29","토","데살로니가전서 1~2"],
+["08-30","일","데살로니가전서 3~4"],["08-31","월","데살로니가전서 5"],["09-01","화","데살로니가후서 1"],
+["09-02","수","데살로니가후서 2~3"],["09-03","목","디모데전서 1"],["09-04","금","디모데전서 2"],
+["09-05","토","디모데전서 3~4"],["09-06","일","디모데전서 5~6"],["09-07","월","디모데후서 1"],
+["09-08","화","디모데후서 2"],["09-09","수","디모데후서 3~4"],["09-10","목","디도서 1"],
+["09-11","금","디도서 2"],["09-12","토","디도서 3, 빌레몬서"],["09-13","일","히브리서 1~2"],
+["09-14","월","히브리서 3"],["09-15","화","히브리서 4"],["09-16","수","히브리서 5~6"],
+["09-17","목","히브리서 7"],["09-18","금","히브리서 8"],["09-19","토","히브리서 9~10"],
+["09-20","일","히브리서 11~12"],["09-21","월","히브리서 13"],["09-22","화","야고보서 1"],
+["09-23","수","야고보서 2~3"],["09-24","목","야고보서 4"],["09-25","금","야고보서 5"],
+["09-26","토","베드로전서 1~2"],["09-27","일","베드로전서 3~4"],["09-28","월","베드로전서 5"],
+["09-29","화","베드로후서 1"],["09-30","수","베드로후서 2~3"],["10-01","목","요한일서 1"],
+["10-02","금","요한일서 2"],["10-03","토","요한일서 3~4"],["10-04","일","요한일서 5, 요한이서"],
+["10-05","월","요한삼서"],["10-06","화","유다서"]
+];
+const TOTAL_DAYS = schedule.length;
+
+const teams = {
+  "1팀": ["지원","민석","철민","현희","옥한","찬향","명주","영민","수진","도경","예정","은경","다경","민정","세은","찬혁"],
+  "2팀": ["희덕","지민","도이","종건","은채","형민","동현","하빈","정하","수빈","연정","현아","은태"],
+  "3팀": ["은혜","한나","윤서","예성","윤진","슬기","태복","김지","민수","주연","상홍","아영","수아","은혜J"],
+  "4팀": ["정은","조수","소라","혜림","현영","재영","주현","준호","세기","인영","병진","종범","수영","세리","혜영","지수","윤형","건호","희정"]
+};
+const nameToTeam = {};
+Object.entries(teams).forEach(([t, list]) => list.forEach(n => nameToTeam[n] = t));
+const ALL_NAMES = Object.values(teams).flat();
+const TOTAL_PEOPLE = ALL_NAMES.length;
+
+/* ---------------- STATE ---------------- */
+let checksAll = {};      // { name: { "07-13": true, ... } }
+let currentName = "";
+
+function todayKey(){
+  const d = new Date();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return mm+"-"+dd;
+}
+
+/* ---------------- STORAGE ----------------
+   공유 데이터(checksAll)는 Firebase Realtime Database에 저장됩니다.
+   개인 설정(내 이름 선택)은 이 브라우저에만 저장되면 되므로 localStorage를 사용합니다.
+--------------------------------------------- */
+async function loadAllOnce(){
+  if(!firebaseReady) return checksAll; // 데모 모드: 메모리에 있는 값 그대로 사용
+  try{
+    const snap = await checksRef.once('value');
+    return snap.val() || {};
+  }catch(e){
+    setStatus("불러오기에 실패했어요.");
+    return {};
+  }
+}
+
+async function saveToggle(name, key, newVal){
+  if(!firebaseReady){
+    // 데모 모드: 메모리에만 반영 (새로고침하면 초기화됨)
+    if(!checksAll[name]) checksAll[name] = {};
+    checksAll[name][key] = newVal;
+    return true;
+  }
+  try{
+    await checksRef.child(name).child(key).set(newVal);
+    return true;
+  }catch(e){
+    setStatus("저장에 실패했어요. 다시 시도해 주세요.");
+    return false;
+  }
+}
+
+function loadMyName(){
+  try{ return localStorage.getItem('my_name') || ""; }catch(e){ return ""; }
+}
+function saveMyName(name){
+  try{ localStorage.setItem('my_name', name); }catch(e){}
+}
+
+function setStatus(msg){
+  document.getElementById('statusLine').textContent = msg;
+  if(msg) setTimeout(()=>{ document.getElementById('statusLine').textContent=''; }, 3000);
+}
+
+/* ---------------- COMPUTE ---------------- */
+function countFor(name){
+  const rec = checksAll[name] || {};
+  return schedule.reduce((acc,[key]) => acc + (rec[key] ? 1 : 0), 0);
+}
+function overallCount(){
+  return ALL_NAMES.reduce((acc,n) => acc + countFor(n), 0);
+}
+
+/* ---------------- RENDER: HEADER RING ---------------- */
+function renderRing(){
+  const total = TOTAL_PEOPLE * TOTAL_DAYS;
+  const done = overallCount();
+  const pct = total ? Math.round((done/total)*100) : 0;
+  const circumference = 232.5;
+  const offset = circumference - (circumference * pct / 100);
+  document.getElementById('ringFill').setAttribute('stroke-dashoffset', offset);
+  document.getElementById('overallPctText').textContent = pct + "%";
+  document.getElementById('overallCountText').textContent = `${done} / ${total} 회 체크됨`;
+}
+
+/* ---------------- RENDER: CHECKLIST ---------------- */
+function populateSelect(){
+  const sel = document.getElementById('nameSelect');
+  sel.innerHTML = '<option value="">내 이름 선택하기</option>';
+  Object.entries(teams).forEach(([team, list])=>{
+    const og = document.createElement('optgroup');
+    og.label = team;
+    list.forEach(n=>{
+      const opt = document.createElement('option');
+      opt.value = n; opt.textContent = n;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+}
+
+function renderChecklist(){
+  const empty = document.getElementById('checklistEmpty');
+  const body = document.getElementById('checklistBody');
+  const meBox = document.getElementById('meProgressBox');
+
+  if(!currentName){
+    empty.style.display = 'block';
+    body.innerHTML = '';
+    meBox.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  meBox.style.display = 'block';
+
+  const count = countFor(currentName);
+  document.getElementById('meBarFill').style.width = (count/TOTAL_DAYS*100)+"%";
+  document.getElementById('meCountText').textContent = `${count} / ${TOTAL_DAYS}`;
+
+  const rec = checksAll[currentName] || {};
+  const tKey = todayKey();
+  let html = '';
+  let lastMonth = '';
+  schedule.forEach(([key, dow, passage])=>{
+    const month = key.slice(0,2);
+    if(month !== lastMonth){
+      html += `<div class="month-label">${parseInt(month)}월</div>`;
+      lastMonth = month;
+    }
+    const isWeekend = (dow === '토' || dow === '일');
+    const isToday = (key === tKey);
+    const checked = !!rec[key];
+    html += `
+      <div class="day-row ${isWeekend ? 'weekend':''} ${isToday ? 'today':''}">
+        <div class="date-badge">${key.replace('-','/')}<span class="dow">${dow}</span></div>
+        <div class="passage">${passage}${isToday ? '<span class="today-tag">오늘</span>' : ''}</div>
+        <button class="stamp ${checked?'checked':''}" data-key="${key}">${checked?'✓':''}</button>
+      </div>`;
+  });
+  body.innerHTML = html;
+
+  body.querySelectorAll('.stamp').forEach(btn=>{
+    btn.addEventListener('click', ()=> onToggle(btn.dataset.key));
+  });
+
+  const todayEl = body.querySelector('.day-row.today');
+  if(todayEl && !renderChecklist._scrolled){
+    todayEl.scrollIntoView({block:'center', behavior:'smooth'});
+    renderChecklist._scrolled = true;
+  }
+}
+
+async function onToggle(key){
+  if(!currentName) return;
+  const currentVal = !!(checksAll[currentName] && checksAll[currentName][key]);
+  const newVal = !currentVal;
+
+  // 화면은 즉시 반영 (낙관적 업데이트)
+  if(!checksAll[currentName]) checksAll[currentName] = {};
+  checksAll[currentName][key] = newVal;
+  renderChecklist();
+  renderRing();
+
+  const ok = await saveToggle(currentName, key, newVal);
+  if(!ok){
+    // 실패 시 되돌리기
+    checksAll[currentName][key] = currentVal;
+    renderChecklist();
+    renderRing();
+  }
+}
+
+/* ---------------- RENDER: TEAMS ---------------- */
+function renderTeams(){
+  const body = document.getElementById('teamsBody');
+  let html = '';
+  Object.entries(teams).forEach(([team, list])=>{
+    const teamDone = list.reduce((acc,n)=>acc+countFor(n),0);
+    const teamPct = Math.round((teamDone/(list.length*TOTAL_DAYS))*100);
+    html += `<div class="team-card">
+      <div class="team-head"><div class="name">${team}</div><div class="pct">${teamPct}%</div></div>`;
+    list.forEach(n=>{
+      const c = countFor(n);
+      const pct = Math.round((c/TOTAL_DAYS)*100);
+      html += `
+        <div class="member-row" data-name="${n}">
+          <div class="mname">${n}</div>
+          <div class="mbar-track"><div class="mbar-fill" style="width:${pct}%"></div></div>
+          <div class="mpct">${pct}%</div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  body.innerHTML = html;
+  body.querySelectorAll('.member-row').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const n = row.dataset.name;
+      document.getElementById('nameSelect').value = n;
+      currentName = n;
+      saveMyName(n);
+      switchTab('checklist');
+      renderChecklist();
+    });
+  });
+}
+
+/* ---------------- RENDER: PROGRESS ---------------- */
+function renderProgress(){
+  const teamBars = document.getElementById('teamBars');
+  let barsHtml = '';
+  Object.entries(teams).forEach(([team, list])=>{
+    const teamDone = list.reduce((acc,n)=>acc+countFor(n),0);
+    const teamTotal = list.length*TOTAL_DAYS;
+    const pct = Math.round((teamDone/teamTotal)*100);
+    barsHtml += `
+      <div class="team-bar-row">
+        <div class="tlabel"><b>${team}</b><span>${pct}%</span></div>
+        <div class="team-bar-track"><div class="team-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  });
+  teamBars.innerHTML = barsHtml;
+
+  const ranked = ALL_NAMES.map(n=>({
+    name:n, team:nameToTeam[n], count:countFor(n),
+    pct: Math.round((countFor(n)/TOTAL_DAYS)*100)
+  })).sort((a,b)=> b.count - a.count);
+
+  const rankBody = document.getElementById('rankBody');
+  rankBody.innerHTML = ranked.map((r,i)=>`
+    <tr>
+      <td class="rk">${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.team}</td>
+      <td>${r.count}/${TOTAL_DAYS}</td>
+      <td class="pct">${r.pct}%</td>
+    </tr>`).join('');
+}
+
+/* ---------------- TABS ---------------- */
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=> b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=> p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(tab === 'teams') renderTeams();
+  if(tab === 'progress') renderProgress();
+}
+
+/* ---------------- REFRESH (수동) ---------------- */
+async function refreshData(){
+  setStatus("불러오는 중…");
+  checksAll = await loadAllOnce();
+  renderRing();
+  renderChecklist();
+  const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+  if(activeTab === 'teams') renderTeams();
+  if(activeTab === 'progress') renderProgress();
+  setStatus(firebaseReady ? "최신 상태로 업데이트했어요" : "데모 모드입니다");
+}
+
+/* ---------------- INIT ---------------- */
+(async function init(){
+  if(!firebaseReady){
+    document.getElementById('demoBanner').classList.add('show');
+  }
+
+  populateSelect();
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.addEventListener('click', ()=> switchTab(b.dataset.tab));
+  });
+  document.getElementById('refreshBtn').addEventListener('click', refreshData);
+  document.getElementById('refreshBtn2').addEventListener('click', refreshData);
+
+  document.getElementById('nameSelect').addEventListener('change', (e)=>{
+    currentName = e.target.value;
+    saveMyName(currentName);
+    renderChecklist._scrolled = false;
+    renderChecklist();
+  });
+
+  checksAll = await loadAllOnce();
+  renderRing();
+
+  const saved = loadMyName();
+  if(saved && ALL_NAMES.includes(saved)){
+    currentName = saved;
+    document.getElementById('nameSelect').value = saved;
+  }
+  renderChecklist();
+
+  // 실시간 동기화: 다른 사람이 체크하면 화면이 자동으로 갱신됩니다
+  if(firebaseReady){
+    checksRef.on('value', (snap)=>{
+      checksAll = snap.val() || {};
+      renderRing();
+      renderChecklist();
+      const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+      if(activeTab === 'teams') renderTeams();
+      if(activeTab === 'progress') renderProgress();
+    });
+  }
+})();
+</script>
+</body>
+</html>
