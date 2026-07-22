@@ -12,26 +12,26 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
   :root{
-    --ink:#F1EAD9;
-    --ink-dim:#B9AF9A;
-    --bg:#12192A;
-    --bg-deep:#0C1220;
-    --card:#1B253D;
-    --card-soft:#212C48;
-    --line:#33405F;
-    --gold:#D8AE68;
-    --gold-soft:rgba(216,174,104,0.18);
-    --sage:#7DA398;
-    --sage-soft:rgba(125,163,152,0.16);
-    --weekend:#243052;
+    --ink:#2B2420;
+    --ink-dim:#8A7A6E;
+    --bg:#FDF1E7;
+    --bg-deep:#F8DDD0;
+    --card:#FFFFFF;
+    --card-soft:#FFF7F0;
+    --line:#F2DCC9;
+    --gold:#E8A93F;
+    --gold-soft:rgba(232,169,63,0.18);
+    --sage:#F49AB0;
+    --sage-soft:rgba(244,154,176,0.16);
+    --weekend:#FDE9EE;
     --radius:14px;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     background:
-      radial-gradient(circle at 15% 0%, #1a2440 0%, transparent 45%),
-      radial-gradient(circle at 90% 10%, #17203a 0%, transparent 40%),
+      radial-gradient(circle at 15% 0%, #FCE0E6 0%, transparent 45%),
+      radial-gradient(circle at 90% 10%, #FDEFDA 0%, transparent 40%),
       var(--bg);
     color:var(--ink);
     font-family:'Pretendard', -apple-system, sans-serif;
@@ -56,7 +56,7 @@
   .sub{ color:var(--ink-dim); font-size:14px; margin-bottom:22px; }
 
   .demo-banner{
-    background:var(--gold-soft); border:1px solid var(--gold); color:var(--gold);
+    background:var(--gold-soft); border:1px solid var(--gold); color:#8A5A0F;
     border-radius:12px; padding:10px 14px; font-size:12.5px; margin-bottom:18px;
     display:none; line-height:1.6;
   }
@@ -69,12 +69,13 @@
     padding:20px 18px;
     display:flex; align-items:center; gap:18px;
     margin-bottom:20px;
+    box-shadow:0 8px 24px rgba(244,154,176,0.12);
   }
   .ring{ position:relative; width:86px; height:86px; flex:none; }
   .ring svg{ width:86px; height:86px; transform:rotate(-90deg); }
   .ring-pct{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:17px; color:var(--gold);
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:17px; color:#C9860F;
   }
   .ring-info{ flex:1; }
   .ring-info .label{ font-size:12.5px; color:var(--ink-dim); margin-bottom:3px; }
@@ -84,6 +85,7 @@
     display:flex; gap:6px; margin-bottom:20px;
     background:var(--card); border:1px solid var(--line);
     border-radius:14px; padding:5px;
+    box-shadow:0 4px 14px rgba(244,154,176,0.08);
   }
   .tab-btn{
     flex:1; padding:10px 4px; text-align:center;
@@ -91,7 +93,7 @@
     font-family:'Pretendard'; font-size:14px; font-weight:600;
     border-radius:10px; cursor:pointer; transition:.18s;
   }
-  .tab-btn.active{ background:var(--gold); color:#221A0E; }
+  .tab-btn.active{ background:var(--gold); color:#2B2005; }
   .panel{ display:none; }
   .panel.active{ display:block; }
 
@@ -117,7 +119,7 @@
   }
   .me-progress .bar-track{ flex:1; height:8px; background:var(--bg-deep); border-radius:99px; overflow:hidden; }
   .me-progress .bar-fill{ height:100%; background:linear-gradient(90deg,var(--sage),var(--gold)); border-radius:99px; transition:width .4s; }
-  .me-progress .count{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--gold); white-space:nowrap; }
+  .me-progress .count{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:#C9860F; white-space:nowrap; }
 
   .empty-hint{
     text-align:center; color:var(--ink-dim); padding:50px 10px; font-size:14px; line-height:1.7;
@@ -142,7 +144,7 @@
   .date-badge .dow{ display:block; font-size:11px; color:var(--ink-dim); }
   .passage{ flex:1; font-size:14.5px; font-weight:500; }
   .today-tag{
-    font-size:10.5px; color:var(--gold); border:1px solid var(--gold); border-radius:99px;
+    font-size:10.5px; color:#C9860F; border:1px solid var(--gold); border-radius:99px;
     padding:2px 7px; margin-left:6px; font-family:'IBM Plex Mono',monospace;
   }
   .stamp{
@@ -152,7 +154,7 @@
     transition:.15s; font-weight:700;
   }
   .stamp.checked{
-    background:var(--gold); border-color:var(--gold); color:#221A0E;
+    background:var(--gold); border-color:var(--gold); color:#2B2005;
     transform:scale(1.04);
   }
   .stamp:active{ transform:scale(.9); }
@@ -179,7 +181,7 @@
   .team-bar-row{ margin-bottom:14px; }
   .team-bar-row .tlabel{ display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:5px; }
   .team-bar-row .tlabel b{ font-weight:700; }
-  .team-bar-row .tlabel span{ color:var(--gold); font-family:'IBM Plex Mono',monospace; }
+  .team-bar-row .tlabel span{ color:#C9860F; font-family:'IBM Plex Mono',monospace; }
   .team-bar-track{ height:9px; background:var(--card); border:1px solid var(--line); border-radius:99px; overflow:hidden; }
   .team-bar-fill{ height:100%; background:linear-gradient(90deg,var(--sage),var(--gold)); border-radius:99px; }
 
@@ -188,7 +190,7 @@
     text-align:left; padding:9px 6px; font-size:13px; border-bottom:1px solid var(--line);
   }
   table.rank th{ color:var(--ink-dim); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; }
-  table.rank td.pct{ font-family:'IBM Plex Mono',monospace; color:var(--gold); }
+  table.rank td.pct{ font-family:'IBM Plex Mono',monospace; color:#C9860F; }
   table.rank td.rk{ color:var(--ink-dim); width:26px; }
 
   .section-title{
@@ -220,8 +222,8 @@
   <div class="ring-card">
     <div class="ring">
       <svg viewBox="0 0 86 86">
-        <circle cx="43" cy="43" r="37" stroke="#33405F" stroke-width="8" fill="none"/>
-        <circle id="ringFill" cx="43" cy="43" r="37" stroke="#D8AE68" stroke-width="8" fill="none"
+        <circle cx="43" cy="43" r="37" stroke="#F2DCC9" stroke-width="8" fill="none"/>
+        <circle id="ringFill" cx="43" cy="43" r="37" stroke="#E8A93F" stroke-width="8" fill="none"
           stroke-dasharray="232.5" stroke-dashoffset="232.5" stroke-linecap="round"/>
       </svg>
       <div class="ring-pct" id="overallPctText">0%</div>
