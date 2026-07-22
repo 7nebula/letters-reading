@@ -173,7 +173,7 @@
     border-radius:8px;
   }
   .member-row:hover{ background:var(--card-soft); }
-  .member-row .mname{ width:64px; flex:none; font-size:13.5px; font-weight:600; }
+  .member-row .mname{ width:76px; flex:none; font-size:13px; font-weight:600; }
   .member-row .mbar-track{ flex:1; height:6px; background:var(--bg-deep); border-radius:99px; overflow:hidden; }
   .member-row .mbar-fill{ height:100%; background:var(--gold); border-radius:99px; }
   .member-row .mpct{ width:38px; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-dim); }
@@ -346,10 +346,10 @@ const schedule = [
 const TOTAL_DAYS = schedule.length;
 
 const teams = {
-  "1팀": ["지원","민석","철민","현희","옥한","찬향","명주","영민","수진","도경","예정","은경","다경","민정","세은","찬혁"],
-  "2팀": ["희덕","지민","도이","종건","은채","형민","동현","하빈","정하","수빈","연정","현아","은태"],
-  "3팀": ["은혜","한나","윤서","예성","윤진","슬기","태복","김지","민수","주연","상홍","아영","수아","은혜J"],
-  "4팀": ["정은","조수","소라","혜림","현영","재영","주현","준호","세기","인영","병진","종범","수영","세리","혜영","지수","윤형","건호","희정"]
+  "1팀": ["최지원", "김민석B", "황철민", "정현희", "김옥한", "정찬향", "김명주", "기영민", "윤수진", "손도경", "성예정", "최은경", "김다경", "김민정", "김세은", "황찬혁"],
+  "2팀": ["윤희덕", "김지민", "김도이", "나종건", "박은채", "표형민", "김동현B", "차하빈", "허정하", "배수빈", "김연정", "우현아", "서은태"],
+  "3팀": ["서은혜", "이한나B", "나윤서", "방예성", "이윤진", "이슬기", "김태복", "김지수E", "조민수B", "전주연", "조상홍", "김아영", "이수아", "정은혜", "사공인영"],
+  "4팀": ["박정은D", "조수진", "김소라", "임혜림", "이현영", "서재영", "정주현", "최준호", "이세기", "조병진", "박종범", "김수영A", "권세리", "양혜영", "우지수", "이윤형", "도건호", "유희정"]
 };
 const nameToTeam = {};
 Object.entries(teams).forEach(([t, list]) => list.forEach(n => nameToTeam[n] = t));
@@ -650,3 +650,4 @@ async function refreshData(){
 </script>
 </body>
 </html>
+```[cite: 1]
